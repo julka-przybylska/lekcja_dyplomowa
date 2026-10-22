@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misja Poznań – Tajemnica Koziołków i Muzycznego Zegara</title>
+<meta name="description" content="Interaktywna misja dla uczniów klasy 4: uratuj zegar na poznańskim Ratuszu, poznaj folklor Wielkopolski i odnajdź zaginioną piosenkę.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1330; --navy2:#16204a; --ink:#eef1ff; --muted:#aab3d9;
+  --gold:#f7c948; --gold2:#ffdf7e; --red:#e5383b; --red2:#ff6b6b;
+  --green:#3ddc97; --teal:#38bdf8; --violet:#a78bfa;
+  --glass:rgba(255,255,255,.07); --glass-b:rgba(255,255,255,.16);
+  --radius:22px; --shadow:0 20px 60px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Nunito',system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 700px at 15% -10%,#2b2f7a 0%,transparent 60%),
+             radial-gradient(900px 600px at 110% 110%,#5b1f4a 0%,transparent 55%),
+             var(--navy);
+  overflow:hidden;
+}
+h1,h2,h3,.btn,.hud,.title-font{font-family:'Fredoka',sans-serif}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.hidden{display:none!important}
+
+/* ---------- stars background ---------- */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:.6em;justify-content:center;
+  padding:.85em 1.6em;border-radius:999px;font-size:1.15rem;font-weight:600;letter-spacing:.3px;
+  background:linear-gradient(135deg,var(--gold2),var(--gold) 50%,#e9a21b);
+  color:#3a2500;box-shadow:0 8px 0 #a86b00,0 14px 30px rgba(247,201,72,.35);
+  transition:transform .15s,box-shadow .15s,filter .2s;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.btn:active{transform:translateY(5px);box-shadow:0 3px 0 #a86b00,0 6px 14px rgba(247,201,72,.3)}
+.btn.red{background:linear-gradient(135deg,var(--red2),var(--red));color:#fff;box-shadow:0 8px 0 #8d1215,0 14px 30px rgba(229,56,59,.35)}
+.btn.green{background:linear-gradient(135deg,#7af0bf,var(--green));color:#053b26;box-shadow:0 8px 0 #12855a,0 14px 30px rgba(61,220,151,.3)}
+.btn.ghost{background:var(--glass);color:var(--ink);box-shadow:inset 0 0 0 2px var(--glass-b)}
+.btn.small{font-size:.9rem;padding:.55em 1.1em;box-shadow:0 4px 0 #a86b00}
+.btn.ghost.small{box-shadow:inset 0 0 0 2px var(--glass-b)}
+.btn:disabled{filter:grayscale(1) brightness(.7);cursor:not-allowed;transform:none}
+
+/* ---------- screens ---------- */
+.screen{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column}
+
+/* ---------- INTRO ---------- */
+#intro{align-items:center;justify-content:center;padding:24px;overflow:auto}
+.intro-card{
+  width:min(980px,100%);display:grid;grid-template-columns:1fr 1.1fr;gap:0;
+  background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));
+  border:1px solid var(--glass-b);border-radius:30px;overflow:hidden;box-shadow:var(--shadow);
+  backdrop-filter:blur(14px);animation:rise .8s cubic-bezier(.2,.9,.3,1.2) both;
+}
+.intro-art{position:relative;min-height:420px;background:url(assets/koziolki.jpg) center/cover}
+.intro-art::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(13,19,48,.9))}
+.intro-art .stamp-top{position:absolute;left:18px;top:18px;background:var(--red);color:#fff;font-family:'Fredoka';
+  padding:.35em .9em;border-radius:8px;transform:rotate(-6deg);box-shadow:0 6px 18px rgba(0,0,0,.4);font-weight:700;letter-spacing:1px}
+.intro-text{padding:38px 40px;display:flex;flex-direction:column;gap:18px}
+.kicker{color:var(--gold);font-weight:800;letter-spacing:3px;text-transform:uppercase;font-size:.8rem}
+.intro-text h1{font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:1.05}
+.intro-text h1 span{background:linear-gradient(90deg,var(--gold2),var(--red2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.letter{
+  background:#f6ecd2;color:#3b2a14;border-radius:14px;padding:18px 20px;font-size:1.05rem;line-height:1.5;
+  box-shadow:inset 0 0 40px rgba(150,100,30,.25),0 10px 25px rgba(0,0,0,.3);min-height:150px;position:relative;
+}
+.letter::before{content:"✉️ PILNE";position:absolute;right:12px;top:-12px;background:var(--red);color:#fff;font:700 .75rem 'Fredoka';padding:.3em .7em;border-radius:6px}
+.caret{display:inline-block;width:2px;height:1.1em;background:#3b2a14;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+.team-row{display:flex;gap:10px;flex-wrap:wrap}
+.team-row input{
+  flex:1;min-width:180px;padding:.85em 1.1em;border-radius:999px;border:2px solid var(--glass-b);
+  background:rgba(0,0,0,.25);color:var(--ink);font:600 1.05rem 'Nunito';outline:none;transition:border .2s
+}
+.team-row input:focus{border-color:var(--gold)}
+
+/* ---------- HUD ---------- */
+.hud{
+  display:flex;align-items:center;gap:18px;padding:12px 22px;flex-wrap:wrap;
+  background:linear-gradient(180deg,rgba(13,19,48,.95),rgba(13,19,48,.7));border-bottom:1px solid var(--glass-b);
+  position:relative;z-index:5
+}
+.hud .logo{font-weight:700;font-size:1.25rem;display:flex;align-items:center;gap:.4em;white-space:nowrap}
+.hud .team{color:var(--gold);font-size:.95rem;font-family:'Nunito';font-weight:800}
+.progress-wrap{flex:1;min-width:220px}
+.progress-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:5px;font-family:'Nunito';font-weight:800}
+.progress{height:16px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
+.progress > div{height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,var(--red2),var(--gold),var(--green));background-size:200% 100%;
+  transition:width 1.4s cubic-bezier(.3,1.3,.5,1);animation:shimmer 3s linear infinite}
+.stars{display:flex;align-items:center;gap:6px;font-size:1.3rem;background:var(--glass);padding:.3em .8em;border-radius:999px;border:1px solid var(--glass-b)}
+.stars b{min-width:1.2em;text-align:center}
+.stars.pop{animation:pop .5s}
+.inventory{display:flex;gap:8px}
+.slot{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;
+  background:rgba(0,0,0,.3);border:2px dashed rgba(255,255,255,.2);color:rgba(255,255,255,.35);position:relative}
+.slot.got{border:2px solid var(--gold);background:radial-gradient(circle,rgba(247,201,72,.35),rgba(0,0,0,.2));animation:pop .6s;color:inherit}
+.slot[data-tip]:hover::after{content:attr(data-tip);position:absolute;top:110%;left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:#000c;padding:.3em .6em;border-radius:6px;font:600 .75rem 'Nunito';z-index:9}
+
+/* ---------- MAP ---------- */
+#mapScreen main{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0;position:relative}
+.map{
+  position:relative;aspect-ratio:16/9;width:min(100%,calc((100vh - 130px)*16/9));
+  border-radius:24px;overflow:hidden;box-shadow:var(--shadow),0 0 0 4px rgba(247,201,72,.35);
+  background:url(assets/mapa.jpg) center/cover;
+}
+#fog{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.marker{
+  position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:3;
+}
+.marker .pin{
+  width:clamp(52px,6vw,78px);height:clamp(52px,6vw,78px);border-radius:50%;display:grid;place-items:center;
+  font-size:clamp(1.6rem,2.6vw,2.4rem);background:radial-gradient(circle at 35% 30%,#fff7d6,var(--gold) 55%,#c88400);
+  box-shadow:0 0 0 5px rgba(255,255,255,.85),0 10px 25px rgba(0,0,0,.5);transition:transform .2s
+}
+.marker .label{font:700 clamp(.75rem,1.1vw,1rem) 'Fredoka';background:rgba(13,19,48,.88);padding:.3em .8em;border-radius:999px;white-space:nowrap;border:1px solid var(--glass-b)}
+.marker.available .pin{animation:bob 1.6s ease-in-out infinite}
+.marker.available::before{content:"";position:absolute;top:0;width:clamp(52px,6vw,78px);height:clamp(52px,6vw,78px);border-radius:50%;
+  border:4px solid var(--gold);animation:ring 1.6s ease-out infinite}
+.marker.available:hover .pin{transform:scale(1.12)}
+.marker.available .label::after{content:" ▶ START";color:var(--gold)}
+.marker.done .pin{background:radial-gradient(circle at 35% 30%,#d9ffef,var(--green) 60%,#109a63);box-shadow:0 0 0 5px rgba(255,255,255,.85),0 10px 25px rgba(0,0,0,.5)}
+.marker.done .label::after{content:" ✔";color:var(--green)}
+.marker.locked{cursor:not-allowed}
+.marker.locked .pin{background:radial-gradient(circle at 35% 30%,#6b7299,#2a3060);filter:saturate(.3);font-size:1.6rem;opacity:.85}
+.marker.locked .label{opacity:.7}
+.map-hint{
+  position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:4;
+  background:rgba(13,19,48,.9);border:1px solid var(--glass-b);padding:.6em 1.2em;border-radius:999px;font-weight:700;
+  display:flex;gap:.5em;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.4);white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis
+}
+.toast{position:fixed;left:50%;top:90px;transform:translate(-50%,-30px);opacity:0;z-index:80;background:#1d2758;border:1px solid var(--glass-b);
+  padding:.8em 1.3em;border-radius:14px;font-weight:700;transition:.35s;box-shadow:var(--shadow);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.teacher-bar{position:fixed;right:14px;bottom:12px;z-index:6;display:flex;gap:8px;opacity:.45;transition:opacity .2s}
+.teacher-bar:hover{opacity:1}
+
+/* ---------- LEVEL OVERLAY ---------- */
+.level{
+  position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;
+  background:radial-gradient(900px 600px at 50% -10%,rgba(80,90,200,.45),transparent 60%),#090d22;
+  animation:fadeIn .4s both
+}
+.level-head{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:1px solid var(--glass-b)}
+.level-head .lv-badge{font:700 .8rem 'Fredoka';letter-spacing:2px;color:#3a2500;background:var(--gold);padding:.35em .8em;border-radius:8px}
+.level-head h2{font-size:1.5rem;flex:1}
+.steps{display:flex;gap:8px}
+.steps i{width:34px;height:8px;border-radius:99px;background:rgba(255,255,255,.15);transition:.4s}
+.steps i.on{background:var(--gold)}
+.steps i.ok{background:var(--green)}
+.level-body{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:26px}
+.panel{
+  width:min(1100px,100%);background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+  border:1px solid var(--glass-b);border-radius:28px;padding:30px 34px;box-shadow:var(--shadow);animation:rise .55s cubic-bezier(.2,.9,.3,1.2) both;
+  margin:auto;
+}
+.panel h3{font-size:clamp(1.4rem,2.4vw,2rem);margin-bottom:10px}
+.story{font-size:1.2rem;line-height:1.55;color:#dfe4ff}
+.story b{color:var(--gold2)}
+.row{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.col{flex:1;min-width:280px}
+.actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px;align-items:center}
+.teacher{margin-top:22px;border-radius:14px;background:rgba(56,189,248,.08);border:1px dashed rgba(56,189,248,.4);font-size:.95rem;color:#bfe7ff}
+.teacher summary{cursor:pointer;padding:.7em 1em;font-weight:800;list-style:none}
+.teacher summary::-webkit-details-marker{display:none}
+.teacher div{padding:0 1em 1em}
+.skip{margin-left:auto;font-size:.85rem;color:var(--muted);text-decoration:underline;opacity:.7}
+.skip:hover{opacity:1}
+
+/* goats stage */
+.goat-stage{position:relative;width:min(380px,100%);aspect-ratio:1;border-radius:24px;overflow:hidden;box-shadow:0 0 0 4px rgba(247,201,72,.4),var(--shadow);margin:auto}
+.goat-stage img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 35%}
+.goat-stage.hit img{animation:bump .22s}
+.goat-stage.stopped img{filter:grayscale(.85) brightness(.6)}
+.goat-stage .tryk{position:absolute;left:50%;top:18%;font:700 2.2rem 'Fredoka';color:var(--gold2);text-shadow:0 3px 0 #a86b00,0 0 20px #000;
+  animation:tryk .6s forwards;pointer-events:none}
+.goat-stage .status{position:absolute;left:12px;bottom:12px;right:12px;text-align:center;background:rgba(0,0,0,.65);padding:.5em;border-radius:12px;font-weight:800}
+
+/* rhythm */
+.pattern{display:flex;gap:10px;justify-content:center;margin:16px 0;flex-wrap:wrap}
+.beat{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;font-size:1.8rem;background:rgba(255,255,255,.06);border:2px solid var(--glass-b);transition:.15s}
+.beat.half{width:44px}
+.beat.rest{opacity:.5;font-size:1rem;font-weight:800}
+.beat.flash{background:var(--gold);transform:scale(1.15);border-color:#fff}
+.beat.you{background:var(--green);border-color:#fff}
+.beat-caption{text-align:center;font:600 1.3rem 'Fredoka';color:var(--gold2)}
+.tap-btn{
+  width:190px;height:190px;border-radius:50%;margin:30px auto 10px;display:grid;place-items:center;
+  font:700 2.4rem 'Fredoka';color:#fff;background:radial-gradient(circle at 35% 30%,#ff9a9a,var(--red) 60%,#8d1215);
+  box-shadow:0 12px 0 #6b0d10,0 20px 40px rgba(229,56,59,.45);transition:transform .08s,box-shadow .08s;user-select:none
+}
+.tap-btn:active,.tap-btn.down{transform:translateY(9px);box-shadow:0 3px 0 #6b0d10,0 8px 20px rgba(229,56,59,.4)}
+.tap-btn:disabled{filter:grayscale(.8) brightness(.6)}
+.round-dots{display:flex;gap:10px;justify-content:center;margin-bottom:6px}
+.round-dots span{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);border:2px solid var(--glass-b);font-weight:800}
+.round-dots span.on{border-color:var(--gold);color:var(--gold)}
+.round-dots span.ok{background:var(--green);color:#053b26;border-color:#fff}
+.feedback{min-height:2em;text-align:center;font:600 1.35rem 'Fredoka';margin-top:6px}
+.feedback.good{color:var(--green)} .feedback.bad{color:var(--red2)}
+
+/* hammer */
+.hammer{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;min-height:80px;align-items:center;margin:14px 0}
+.hammer span{font:700 2.4rem 'Fredoka';color:var(--gold2);animation:pop .3s}
+.gear{font-size:5rem;display:inline-block}
+.gear.spin{animation:spin 2s linear infinite}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:18px}
+.flip{perspective:1000px;height:270px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.3,1.4,.5,1);transform-style:preserve-3d}
+.flip.open .flip-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.front{background:linear-gradient(145deg,#2c3a85,#1a2257);border:2px solid var(--glass-b);gap:10px}
+.front .big{font-size:4rem;animation:bob 2s ease-in-out infinite}
+.front p{font:600 1.15rem 'Fredoka'}
+.front small{color:var(--muted)}
+.back{transform:rotateY(180deg);background:#f6ecd2;color:#3b2a14;font-size:1.02rem;line-height:1.45;justify-content:flex-start;gap:8px;
+  box-shadow:inset 0 0 40px rgba(150,100,30,.25)}
+.back h4{font:700 1.2rem 'Fredoka';color:#a1121a}
+
+/* quiz */
+.q{margin:14px 0 22px}
+.q h4{font:600 1.35rem 'Fredoka';margin-bottom:12px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.opt{padding:1em 1.1em;border-radius:16px;background:rgba(255,255,255,.07);border:2px solid var(--glass-b);font:600 1.15rem 'Fredoka';text-align:left;
+  display:flex;gap:.6em;align-items:center;transition:.15s}
+.opt:hover{background:rgba(255,255,255,.13);transform:translateY(-2px)}
+.opt.right{background:rgba(61,220,151,.25);border-color:var(--green)}
+.opt.wrong{background:rgba(229,56,59,.25);border-color:var(--red);animation:shake .4s}
+.opt.sel{background:rgba(247,201,72,.2);border-color:var(--gold)}
+.opt:disabled{cursor:default}
+
+/* dance */
+.dance-stage{height:340px;border-radius:24px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden;transition:background .4s;
+  background:linear-gradient(135deg,#3a1c71,#d76d77,#ffaf7b)}
+.dance-stage.freeze{background:linear-gradient(135deg,#4b5563,#9ca3af,#d1d5db)}
+.dance-stage.idle{background:linear-gradient(135deg,#1e2a66,#2c3a85)}
+.dance-stage .who{font-size:7rem;line-height:1}
+.dance-stage.dancing .who{animation:dance .45s ease-in-out infinite alternate}
+.dance-stage .cmd{font:700 clamp(2rem,5vw,3.6rem) 'Fredoka';text-shadow:0 4px 0 rgba(0,0,0,.25)}
+.dance-stage .sub{font-weight:800;font-size:1.1rem;opacity:.9}
+.dance-stage .notes{position:absolute;inset:0;pointer-events:none}
+.dance-stage .notes span{position:absolute;bottom:-40px;font-size:2rem;animation:floatUp 3s linear forwards}
+
+/* tree */
+.tree{position:relative;height:420px;width:min(560px,100%);margin:auto}
+.crown{position:absolute;left:50%;top:0;transform:translateX(-50%);width:100%;height:340px;
+  background:radial-gradient(circle at 30% 45%,#3fae5a 0 26%,transparent 27%),radial-gradient(circle at 70% 45%,#3fae5a 0 26%,transparent 27%),
+  radial-gradient(circle at 50% 30%,#4cc068 0 30%,transparent 31%),radial-gradient(circle at 50% 62%,#2f9a4b 0 30%,transparent 31%),
+  radial-gradient(circle at 20% 65%,#2f9a4b 0 18%,transparent 19%),radial-gradient(circle at 80% 65%,#2f9a4b 0 18%,transparent 19%);
+  filter:drop-shadow(0 10px 20px rgba(0,0,0,.4))}
+.trunk{position:absolute;left:50%;bottom:0;width:60px;height:140px;transform:translateX(-50%);background:linear-gradient(90deg,#6b3f1d,#8b5a2b,#6b3f1d);border-radius:10px 10px 4px 4px}
+.leaf{position:absolute;font-size:2.6rem;transform:translate(-50%,-50%);transition:transform .2s;z-index:2}
+.leaf:hover{transform:translate(-50%,-50%) scale(1.2) rotate(-10deg)}
+.leaf.gone{animation:leafAway .8s forwards;pointer-events:none}
+.apple{position:absolute;transform:translate(-50%,-50%);font-size:2.4rem;z-index:1;animation:pop .4s}
+.apple.picked{animation:toBasket .7s forwards}
+.basket{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:56px;padding:12px;border-radius:18px;background:rgba(139,90,43,.25);border:2px dashed #b07a45;margin-top:12px}
+.chip{padding:.55em 1em;border-radius:999px;background:linear-gradient(135deg,#ff8a8a,var(--red));color:#fff;font:600 1.15rem 'Fredoka';box-shadow:0 5px 0 #8d1215;animation:pop .35s;transition:.15s}
+.chip:hover{transform:translateY(-2px)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.wrong{animation:shake .4s}
+.verse{min-height:120px;border-radius:18px;background:#f6ecd2;color:#3b2a14;padding:18px;font:600 1.6rem 'Fredoka';display:flex;flex-wrap:wrap;gap:.4em;align-items:center;justify-content:center;margin:14px 0;
+  box-shadow:inset 0 0 40px rgba(150,100,30,.25)}
+.verse .ph{color:#b9a27a}
+.verse span.w{animation:pop .35s}
+
+/* sing */
+.lyrics{font:600 clamp(1.8rem,4vw,3rem) 'Fredoka';text-align:center;line-height:1.5;margin:10px 0}
+.lyrics .apple-word{color:var(--red2);display:inline-block}
+.lyrics .apple-word.spin{animation:spinOnce 1s}
+.lyrics .apple-word::after{content:" 🔄";font-size:.6em}
+.clap{font-size:4rem;text-align:center;transition:transform .1s}
+.clap.beat{transform:scale(1.35)}
+.legend-box{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-weight:800;color:var(--muted)}
+
+/* reward */
+.reward{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(5,8,22,.82);backdrop-filter:blur(6px);animation:fadeIn .3s}
+.reward-card{text-align:center;padding:40px 46px;border-radius:30px;width:min(560px,92vw);
+  background:linear-gradient(160deg,#27306f,#141a42);border:2px solid var(--gold);box-shadow:0 0 80px rgba(247,201,72,.35);animation:rise .6s cubic-bezier(.2,.9,.3,1.3)}
+.reward-card .item{font-size:6.5rem;display:inline-block;animation:itemIn 1s cubic-bezier(.2,.9,.3,1.4) both;filter:drop-shadow(0 0 30px rgba(247,201,72,.8))}
+.reward-card h2{font-size:2.1rem;margin:10px 0 6px}
+.reward-card p{color:#dfe4ff;font-size:1.1rem;line-height:1.5}
+.reward-card .unlock{margin:18px 0;padding:.8em 1em;border-radius:14px;background:rgba(61,220,151,.15);border:1px solid var(--green);font-weight:800}
+.rays{position:absolute;inset:0;pointer-events:none;background:repeating-conic-gradient(from 0deg,rgba(247,201,72,.08) 0 10deg,transparent 10deg 20deg);animation:spin 30s linear infinite}
+
+/* certificate */
+.cert{position:relative;background:#f8efd7;color:#3b2a14;border-radius:20px;padding:40px;text-align:center;border:10px double #b8862b;box-shadow:inset 0 0 70px rgba(150,100,30,.3)}
+.cert h3{font:700 2.2rem 'Fredoka';color:#7a1015}
+.cert .team-name{font:700 2.6rem 'Fredoka';color:#1d2b6b;margin:10px 0;border-bottom:2px dashed #b8862b;display:inline-block;padding:0 .5em}
+.seal{width:170px;height:170px;border-radius:50%;margin:18px auto 0;display:grid;place-items:center;text-align:center;
+  background:radial-gradient(circle,#ff6b6b,#b3141a 70%);color:#fff;font:700 .95rem 'Fredoka';line-height:1.15;box-shadow:0 0 0 8px #e5383b55,0 10px 25px rgba(0,0,0,.35);
+  border:4px dashed #ffd6d6;animation:slam .7s cubic-bezier(.3,1.6,.5,1) .5s both}
+.seal .s-ico{font-size:2.6rem}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:90}
+
+/* animations */
+@keyframes rise{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes blink{50%{opacity:0}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes ring{from{transform:scale(1);opacity:1}to{transform:scale(1.9);opacity:0}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.06) rotate(-1deg)}100%{transform:scale(1)}}
+@keyframes tryk{from{opacity:1;transform:translate(-50%,0) scale(.6)}to{opacity:0;transform:translate(-50%,-50px) scale(1.3)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinOnce{to{transform:rotate(360deg)}}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes dance{from{transform:rotate(-12deg) translateY(0)}to{transform:rotate(12deg) translateY(-18px)}}
+@keyframes floatUp{to{transform:translateY(-420px) rotate(30deg);opacity:0}}
+@keyframes leafAway{to{transform:translate(120px,-140px) rotate(160deg);opacity:0}}
+@keyframes toBasket{to{transform:translate(-50%,300px) scale(.3);opacity:0}}
+@keyframes itemIn{0%{transform:scale(0) rotate(-200deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes slam{0%{transform:scale(3) rotate(-30deg);opacity:0}100%{transform:scale(1) rotate(-8deg);opacity:1}}
+
+@media (max-width:760px){
+  .intro-card{grid-template-columns:1fr}.intro-art{min-height:240px}
+  .intro-text{padding:26px}
+  .hud{gap:10px;padding:10px 12px}.slot{width:38px;height:38px;font-size:1.2rem}
+}
+@media print{
+  body *{visibility:hidden}
+  .cert,.cert *{visibility:visible}
+  .cert{position:fixed;left:0;top:0;width:100%}
+}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+
+<!-- ============ INTRO ============ -->
+<section id="intro" class="screen">
+  <div class="intro-card">
+    <div class="intro-art" role="img" aria-label="Koziołki na wieży poznańskiego Ratusza"><span class="stamp-top">ŚCIŚLE TAJNE</span></div>
+    <div class="intro-text">
+      <div class="kicker">🕵️ Biuro Poznańskich Detektywów</div>
+      <h1>Tajemnica <span>Poznańskich Koziołków</span> i Muzycznego Zegara</h1>
+      <div class="letter" id="letter"></div>
+      <div class="team-row">
+        <input id="teamInput" maxlength="28" placeholder="Nazwa drużyny, np. Agenci z 4b" aria-label="Nazwa drużyny">
+        <button class="btn" id="startBtn">Przyjmuję misję 🚀</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAP ============ -->
+<section id="mapScreen" class="screen hidden">
+  <header class="hud">
+    <div class="logo">🐐 Misja Poznań <span class="team" id="hudTeam"></span></div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>🎵 Muzyka miasta przywrócona</span><span id="progTxt">0%</span></div>
+      <div class="progress"><div id="progBar"></div></div>
+    </div>
+    <div class="stars" id="stars" title="Zdobyte gwiazdki">⭐ <b id="starCount">0</b></div>
+    <div class="inventory" id="inventory" aria-label="Dziennik detektywa"></div>
+  </header>
+  <main>
+    <div class="map" id="map">
+      <canvas id="fog"></canvas>
+      <div class="map-hint" id="mapHint">🧭 Kliknijcie świecące miejsce na mapie!</div>
+    </div>
+  </main>
+  <div class="teacher-bar">
+    <button class="btn ghost small" id="fsBtn" title="Pełny ekran">⛶ Pełny ekran</button>
+    <button class="btn ghost small" id="resetBtn" title="Zacznij od nowa">↺ Nowa gra</button>
+  </div>
+</section>
+
+<div id="levelRoot"></div>
+<div id="rewardRoot"></div>
+<div class="toast" id="toast"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* =========================================================
+   DANE GRY
+========================================================= */
+const LOCS = [
+  {name:'Wieża Ratuszowa', icon:'⏰', x:52, y:22, item:{icon:'⚙️', name:'Złota zębatka'}},
+  {name:'Stary Rynek',     icon:'💃', x:43, y:66, item:{icon:'🎻', name:'Zaczarowana nuta'}},
+  {name:'Ogród Owocowy',   icon:'🍎', x:86, y:76, item:{icon:'🍎', name:'Czerwone jabłuszko'}},
+  {name:'Balkon Koziołków',icon:'🐐', x:60, y:46, item:{icon:'🏅', name:'Pieczęć Super-Detektywa'}},
+];
+const KEY = 'misja-poznan-v1';
+let state = load() || {team:'', done:0, stars:0};
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+
+const $ = s => document.querySelector(s);
+const el = (tag, attrs={}, html='') => { const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v)); e.innerHTML=html; return e; };
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+
+/* =========================================================
+   AUDIO (Web Audio – bez plików)
+========================================================= */
+let AC;
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
+const mtof = m => 440*Math.pow(2,(m-69)/12);
+function knock(delay=0, f=950, vol=.8){
+  const c=ac(), t=c.currentTime+delay, o=c.createOscillator(), g=c.createGain();
+  o.type='triangle'; o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*.45,t+.09);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+.16);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+.2);
+}
+function tone(f, delay, dur, type='sine', vol=.2, dest){
+  const c=ac(), t=c.currentTime+delay, o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.value=f;
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(dest||c.destination); o.start(t); o.stop(t+dur+.05);
+}
+function jingle(){ [72,76,79,84].forEach((m,i)=>tone(mtof(m),i*.11,.35,'triangle',.22)); tone(mtof(88),.46,.7,'sine',.15); }
+function bigFanfare(){ [60,64,67,72,67,72,76,79,84].forEach((m,i)=>tone(mtof(m),i*.12,.4,'triangle',.2)); }
+function oops(){ tone(330,0,.18,'square',.06); tone(247,.16,.3,'square',.06); }
+function bell(delay){ tone(mtof(81),delay,1.4,'sine',.18); tone(mtof(93),delay,.8,'sine',.06); }
+
+/* --- ludowa melodia (obertas, 3/4) z burdonem "kozła" --- */
+const FOLK=[[74,1],[73,1],[74,1],[76,1],[78,1],[74,1],[69,1],[69,1],[71,1],[69,1],[67,1],[66,1],
+            [64,1],[66,1],[67,1],[69,1],[71,1],[73,1],[74,2],[69,2],[74,2],
+            [78,1],[76,1],[74,1],[76,1],[78,1],[79,1],[81,1],[78,1],[74,1],[78,1],[81,1],[78,1],
+            [79,1],[76,1],[73,1],[76,1],[79,1],[76,1],[74,2],[74,1],[73,1],[74,2]];
+const CHORDS=['D','D','A','D','D','D','A','D'];
+const folk={on:false};
+function folkStart(){
+  const c=ac(); folk.on=true; folk.idx=0; folk.ec=0; folk.e=.17; folk.t=c.currentTime+.06;
+  folk.out=c.createGain(); folk.out.gain.value=.9; folk.out.connect(c.destination);
+  const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700; lp.connect(folk.out);
+  const dg=c.createGain(); dg.gain.value=.035; dg.connect(lp);
+  folk.drone=[50,57].map(m=>{const o=c.createOscillator(); o.type='sawtooth'; o.frequency.value=mtof(m); o.connect(dg); o.start(); return o;});
+  folk.lead=c.createBiquadFilter(); folk.lead.type='lowpass'; folk.lead.frequency.value=2600; folk.lead.connect(folk.out);
+  folk.timer=setInterval(folkTick,25);
+}
+function folkTick(){
+  const c=ac();
+  while(folk.t < c.currentTime+.15){
+    const [m,d]=FOLK[folk.idx];
+    const t0=folk.t-c.currentTime;
+    tone(mtof(m), t0, d*folk.e*.92, 'sawtooth', .09, folk.lead);
+    for(let k=0;k<d;k++){
+      const e=folk.ec+k; if(e%2) continue;
+      const beat=(e%6)/2, ch=CHORDS[Math.floor(e/6)%8], when=t0+k*folk.e;
+      if(beat===0) tone(mtof(ch==='D'?38:45), when, .25, 'triangle', .28, folk.out);
+      else (ch==='D'?[62,66,69]:[61,64,69]).forEach(n=>tone(mtof(n-12), when, .14, 'square', .025, folk.out));
+    }
+    folk.ec+=d; folk.t+=d*folk.e; folk.idx=(folk.idx+1)%FOLK.length;
+  }
+}
+function folkStop(){
+  if(!folk.on) return; folk.on=false; clearInterval(folk.timer);
+  const c=ac(); folk.out.gain.setTargetAtTime(0,c.currentTime,.04);
+  folk.drone.forEach(o=>o.stop(c.currentTime+.3));
+}
+
+/* =========================================================
+   TŁO – gwiazdy
+========================================================= */
+(function sky(){
+  const cv=$('#sky'), x=cv.getContext('2d'); let stars=[];
+  function size(){ cv.width=innerWidth; cv.height=innerHeight; stars=Array.from({length:140},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.6+.2,p:Math.random()*6})); }
+  size(); addEventListener('resize',size);
+  (function loop(t){ x.clearRect(0,0,cv.width,cv.height);
+    stars.forEach(s=>{ x.globalAlpha=.35+.65*Math.abs(Math.sin(t/1400+s.p)); x.fillStyle='#fff'; x.beginPath(); x.arc(s.x,s.y,s.r,0,7); x.fill(); });
+    requestAnimationFrame(loop); })(0);
+})();
+
+/* =========================================================
+   INTRO
+========================================================= */
+const LETTER = 'Witajcie, Agenci! Otrzymałem pilną wiadomość z Poznania. Stary Ratusz ucierpiał w wyniku tajemniczej awarii. Zegar stoi, a legendarne koziołki zapomniały rytmu, w jakim powinny się trykać! Co gorsza, zniknęły tradycyjne nuty z poznańskich ulic. Musicie przejść trzy poziomy poznańskiego folkloru i uratować miasto!';
+async function typeLetter(){
+  const box=$('#letter'); box.innerHTML='<span id="lt"></span><span class="caret"></span>';
+  const lt=$('#lt');
+  for(let i=0;i<LETTER.length;i++){ lt.textContent+=LETTER[i]; await sleep(LETTER[i]===' '?14:22); }
+}
+$('#teamInput').value = state.team || '';
+$('#startBtn').onclick = () => {
+  ac(); jingle();
+  state.team = $('#teamInput').value.trim() || 'Poznańscy Detektywi'; save();
+  $('#intro').classList.add('hidden'); showMap();
+};
+$('#teamInput').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#startBtn').click(); });
+
+/* =========================================================
+   MAPA + MGŁA
+========================================================= */
+let revealAnim = {idx:-1, start:0};
+function showMap(){
+  $('#mapScreen').classList.remove('hidden');
+  $('#hudTeam').textContent = '· ' + state.team;
+  renderHud(); renderMarkers();
+}
+function renderHud(){
+  const pct = Math.round(state.done/LOCS.length*100);
+  $('#progBar').style.width = pct+'%'; $('#progTxt').textContent = pct+'%';
+  $('#starCount').textContent = state.stars;
+  const inv=$('#inventory'); inv.innerHTML='';
+  LOCS.forEach((l,i)=>{ const got=i<state.done; inv.appendChild(el('div',{class:'slot'+(got?' got':''),'data-tip':got?l.item.name:'Ukryty przedmiot'}, got?l.item.icon:'?')); });
+  const hint = state.done>=LOCS.length ? '🏆 Misja ukończona! Miasto znów gra!' :
+    state.done===0 ? '🧭 Mgła zakrywa miasto… Kliknijcie świecące miejsce: <b>&nbsp;Wieża Ratuszowa</b>' :
+    `🧭 Następny cel: <b>&nbsp;${LOCS[state.done].name}</b>`;
+  $('#mapHint').innerHTML = hint;
+}
+function renderMarkers(){
+  document.querySelectorAll('.marker').forEach(m=>m.remove());
+  LOCS.forEach((l,i)=>{
+    const cls = i<state.done ? 'done' : i===state.done ? 'available' : 'locked';
+    const m = el('button',{class:'marker '+cls, id:'marker-'+i, style:`left:${l.x}%;top:${l.y}%`},
+      `<div class="pin">${cls==='locked'?'🔒':l.icon}</div><div class="label">${cls==='locked'?'???':l.name}</div>`);
+    m.onclick = () => {
+      if(cls==='locked'){ oops(); toast('🌫️ To miejsce spowija mgła… Najpierw ukończcie poprzednie zadanie!'); return; }
+      if(cls==='done'){ toast('✔ To miejsce już uratowaliście! Brawo!'); return; }
+      ac(); openLevel(i);
+    };
+    $('#map').appendChild(m);
+  });
+}
+const fogBlobs = Array.from({length:55},()=>({x:Math.random(),y:Math.random(),r:.08+Math.random()*.14,s:.2+Math.random()*.6,p:Math.random()*6}));
+(function fogLoop(){
+  const cv=$('#fog'), x=cv.getContext('2d');
+  function frame(t){
+    const r=cv.getBoundingClientRect();
+    if(r.width){
+      const dpr=devicePixelRatio||1;
+      if(cv.width!==Math.round(r.width*dpr)){ cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr); }
+      const W=cv.width,H=cv.height;
+      x.globalCompositeOperation='source-over'; x.clearRect(0,0,W,H);
+      x.fillStyle='rgba(18,24,58,.78)'; x.fillRect(0,0,W,H);
+      fogBlobs.forEach(b=>{
+        const bx=((b.x+Math.sin(t/9000*b.s+b.p)*.03)%1)*W, by=(b.y+Math.cos(t/11000*b.s+b.p)*.03)*H, br=b.r*W;
+        const g=x.createRadialGradient(bx,by,0,bx,by,br); g.addColorStop(0,'rgba(190,200,240,.28)'); g.addColorStop(1,'rgba(190,200,240,0)');
+        x.fillStyle=g; x.beginPath(); x.arc(bx,by,br,0,7); x.fill();
+      });
+      x.globalCompositeOperation='destination-out';
+      const maxI=Math.min(state.done, LOCS.length-1);
+      for(let i=0;i<=maxI;i++){
+        let k=1;
+        if(i===revealAnim.idx){ k=Math.min(1,(t-revealAnim.start)/2200); k=1-Math.pow(1-k,3); }
+        const R=W*.19*k*(state.done>=LOCS.length?3:1), cx=LOCS[i].x/100*W, cy=LOCS[i].y/100*H;
+        if(R<=0) continue;
+        const g=x.createRadialGradient(cx,cy,R*.35,cx,cy,R); g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+        x.fillStyle=g; x.beginPath(); x.arc(cx,cy,R,0,7); x.fill();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* =========================================================
+   SILNIK POZIOMÓW
+========================================================= */
+let L = null; // aktualny poziom
+function openLevel(i){
+  const def = LEVELS[i];
+  const root = $('#levelRoot');
+  root.innerHTML = `<div class="level" id="level">
+    <div class="level-head">
+      <span class="lv-badge">${i<3?'POZIOM '+(i+1):'FINAŁ'}</span>
+      <h2>${LOCS[i].icon} ${LOCS[i].name}</h2>
+      <div class="steps" id="steps">${def.steps.map(()=>'<i></i>').join('')}</div>
+      <button class="btn ghost small" id="closeLevel" title="Wróć na mapę">✕ Mapa</button>
+    </div>
+    <div class="level-body"><div class="panel" id="panel"></div></div>
+  </div>`;
+  L = {i, def, step:0, cleanup:[]};
+  $('#closeLevel').onclick = closeLevel;
+  goStep(0);
+}
+function closeLevel(){ runCleanup(); $('#levelRoot').innerHTML=''; L=null; }
+function runCleanup(){ if(!L) return; L.cleanup.forEach(f=>f()); L.cleanup=[]; folkStop(); }
+function goStep(n){
+  runCleanup();
+  L.step=n;
+  document.querySelectorAll('#steps i').forEach((d,k)=>d.className = k<n?'ok':k===n?'on':'');
+  const p=$('#panel'); p.style.animation='none'; p.offsetHeight; p.style.animation='';
+  p.innerHTML=''; L.def.steps[n](p);
+  $('.level-body').scrollTop=0;
+}
+function next(){ if(L.step < L.def.steps.length-1) goStep(L.step+1); else finishLevel(); }
+function addStar(n=1){ state.stars+=n; save(); const s=$('#stars'); s.classList.remove('pop'); s.offsetHeight; s.classList.add('pop'); $('#starCount').textContent=state.stars; }
+function teacherNote(html){ return `<details class="teacher"><summary>📋 Wskazówka dla nauczyciela</summary><div>${html}</div></details>`; }
+function skipLink(){ return `<button class="skip" data-skip>⏭ zaliczone przez nauczyciela</button>`; }
+function bindSkip(p){ const s=p.querySelector('[data-skip]'); if(s) s.onclick=()=>{ jingle(); next(); }; }
+
+function finishLevel(){
+  const i=L.i; closeLevel();
+  state.done=Math.max(state.done,i+1); save();
+  jingle(); confetti(160);
+  const loc=LOCS[i], nxt=LOCS[i+1];
+  const rr=$('#rewardRoot');
+  rr.innerHTML=`<div class="reward"><div class="rays"></div><div class="reward-card">
+    <div class="kicker">Zadanie wykonane!</div>
+    <div class="item">${loc.item.icon}</div>
+    <h2>${loc.item.name}</h2>
+    <p>${LEVELS[i].reward}</p>
+    ${nxt?`<div class="unlock">🗺️ Mgła się rozwiewa… Odkryto nowe miejsce: <b>${nxt.name}</b>!</div>`:''}
+    <button class="btn" id="toMap">${nxt?'Na mapę – dalej! ➜':'Zobacz uratowane miasto 🏙️'}</button>
+  </div></div>`;
+  $('#toMap').onclick=()=>{
+    rr.innerHTML=''; renderHud(); renderMarkers();
+    revealAnim={idx: nxt? i+1 : -1, start: performance.now()};
+    if(nxt){ setTimeout(()=>{ const m=$('#marker-'+(i+1)); m && m.animate([{transform:'translate(-50%,-50%) scale(0)'},{transform:'translate(-50%,-50%) scale(1.3)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:700,easing:'ease-out'}); tone(mtof(84),0,.5,'sine',.15); },900); }
+    else { bigFanfare(); confetti(300); }
+  };
+}
+
+/* =========================================================
+   POZIOM 1 – Wieża Ratuszowa
+========================================================= */
+const RHYTHMS = [
+  {beats:[0,1],        grid:['🐐','🐐','·','·'],          caption:'raz – dwa – pauza'},
+  {beats:[0,1,2],      grid:['🐐','🐐','🐐','·'],          caption:'raz – dwa – trzy – pauza'},
+  {beats:[0,1,1.5,2],  grid:['🐐','🐐','🐐h','🐐','·'],   caption:'raz – dwa i – trzy – pauza'},
+];
+const BEAT = .62; // sek.
+
+const L1 = {
+  reward:'Zegar na wieży znów tyka! Koziołki przypomniały sobie swój rytm. Do Dziennika Detektywa trafia <b>Złota zębatka</b>.',
+  steps:[
+    // 1. fabuła
+    p=>{
+      p.innerHTML=`<div class="row">
+        <div class="col"><div class="goat-stage stopped" id="gs"><img src="assets/koziolki.jpg" alt="Koziołki na wieży"><div class="status">⛔ ZEGAR STOI</div></div></div>
+        <div class="col">
+          <h3>Tajemnica Wieży Ratuszowej</h3>
+          <p class="story">Stoicie pod wieżą <b>poznańskiego Ratusza</b>. Wskazówki zegara zamarły, a koziołki stoją nieruchomo jak z kamienia…<br><br>
+          Aby uruchomić mechanizm zegara, musicie <b>odtworzyć rytm</b>, w jakim koziołki trykają się rogami! Najpierw jednak rozgrzejemy nasz własny mechanizm – <b>Młoteczek</b>.</p>
+          <div class="actions"><button class="btn" id="go">Do dzieła! 🔧</button></div>
+        </div></div>`;
+      $('#go').onclick=next;
+    },
+    // 2. młoteczek
+    p=>{
+      p.innerHTML=`<h3>🔨 Rozgrzewka: Młoteczek</h3>
+        <p class="story">Lekko stukajcie <b>czubkiem języka</b> o podniebienie tuż za górnymi zębami: <b>t-t-t</b> albo <b>d-d-d</b>. Tak brzmi mechanizm zegara! Stukajcie razem z zębatką.</p>
+        <div style="text-align:center;margin-top:16px"><span class="gear" id="gear">⚙️</span></div>
+        <div class="hammer" id="hammer"></div>
+        <div class="actions" style="justify-content:center"><button class="btn" id="hm">▶ Uruchom młoteczek</button><button class="btn green hidden" id="hmNext">Mechanizm rozgrzany! ➜</button></div>
+        ${teacherNote('Zegar wystukuje 16 równych „tyknięć”. Dzieci naśladują je językiem (t-t-t / d-d-d). Można powtórzyć szybciej lub ciszej.')}`;
+      let timers=[];
+      $('#hm').onclick=()=>{
+        $('#hm').disabled=true; $('#gear').classList.add('spin'); const h=$('#hammer'); h.innerHTML='';
+        for(let k=0;k<16;k++) timers.push(setTimeout(()=>{ knock(0,k%4===0?1300:1000,.5); if(h.children.length>=8) h.innerHTML=''; h.appendChild(el('span',{},k%2?'d':'t')); },k*420));
+        timers.push(setTimeout(()=>{ $('#gear').classList.remove('spin'); $('#hm').disabled=false; $('#hm').textContent='↺ Jeszcze raz'; $('#hmNext').classList.remove('hidden'); addStar(); toast('⭐ +1 gwiazdka za rozgrzewkę!'); },16*420+200));
+      };
+      $('#hmNext').onclick=next;
+      L.cleanup.push(()=>timers.forEach(clearTimeout));
+    },
+    // 3. gra rytmiczna
+    p=>{
+      let round=0, taps=[], listening=false, timers=[], waitT;
+      p.innerHTML=`<div class="row" style="align-items:flex-start">
+        <div class="col" style="max-width:400px"><div class="goat-stage stopped" id="gs"><img src="assets/koziolki.jpg" alt="Koziołki"><div class="status" id="gsStatus">Posłuchajcie koziołków!</div></div></div>
+        <div class="col">
+          <h3>🥁 Echo koziołków</h3>
+          <div class="round-dots" id="rd">${RHYTHMS.map((_,k)=>`<span>${k+1}</span>`).join('')}</div>
+          <div class="pattern" id="pat"></div>
+          <div class="beat-caption" id="cap"></div>
+          <p class="story" style="text-align:center;font-size:1.05rem;margin-top:8px">1️⃣ Posłuchajcie  ·  2️⃣ Cała klasa klaszcze lub tupie  ·  3️⃣ Jeden Agent stuka w przycisk <b>TRYK!</b> (lub spacja)</p>
+          <div class="actions" style="justify-content:center;margin-top:12px"><button class="btn" id="play">▶ Posłuchaj koziołków</button></div>
+          <button class="tap-btn" id="tap" disabled>TRYK!</button>
+          <div class="feedback" id="fb"></div>
+          <div class="actions">${skipLink()}</div>
+        </div></div>
+        ${teacherNote('Nauczyciel może też sam wystukać rytm, a klasa powtarza klaskaniem/tupaniem. Aplikacja sprawdza liczbę uderzeń i odstępy między nimi (z dużą tolerancją). Jeśli klasa wykonała zadanie poprawnie „na żywo”, kliknij „zaliczone przez nauczyciela”.')}`;
+      bindSkip(p);
+      const gs=$('#gs');
+      function hit(){ gs.classList.remove('hit'); gs.offsetHeight; gs.classList.add('hit'); const t=el('div',{class:'tryk'},'TRYK!'); gs.appendChild(t); setTimeout(()=>t.remove(),600); }
+      function drawRound(){
+        const r=RHYTHMS[round];
+        document.querySelectorAll('#rd span').forEach((s,k)=>s.className=k<round?'ok':k===round?'on':'');
+        $('#pat').innerHTML=r.grid.map(g=>g==='·'?'<div class="beat rest">pauza</div>':g==='🐐h'?'<div class="beat half">🐐</div>':'<div class="beat">🐐</div>').join('');
+        $('#cap').textContent=r.caption; $('#fb').textContent=''; $('#fb').className='feedback';
+        $('#tap').disabled=true; taps=[]; listening=false;
+      }
+      function playPattern(){
+        const r=RHYTHMS[round]; const cells=[...document.querySelectorAll('#pat .beat:not(.rest)')];
+        $('#play').disabled=true; $('#tap').disabled=true; $('#gsStatus').textContent='👂 Słuchajcie…'; $('#fb').textContent='';
+        r.beats.forEach((b,k)=>{ knock(b*BEAT,1000,.8); timers.push(setTimeout(()=>{ hit(); cells[k]&&cells[k].classList.add('flash'); setTimeout(()=>cells[k]&&cells[k].classList.remove('flash'),180); }, b*BEAT*1000)); });
+        const end=(r.beats.at(-1)+1)*BEAT*1000;
+        timers.push(setTimeout(()=>{ $('#play').disabled=false; $('#play').textContent='↺ Posłuchaj jeszcze raz'; $('#tap').disabled=false; listening=true; taps=[]; $('#gsStatus').textContent='👏 Teraz wy! Klaszczcie, potem TRYK!'; }, end));
+      }
+      function onTap(){
+        if(!listening) return;
+        const r=RHYTHMS[round]; const now=performance.now(); taps.push(now);
+        knock(0,800,.7); hit();
+        const cells=[...document.querySelectorAll('#pat .beat:not(.rest)')]; cells[taps.length-1]&&cells[taps.length-1].classList.add('you');
+        clearTimeout(waitT);
+        if(taps.length>=r.beats.length){ listening=false; setTimeout(evaluate,250); }
+        else waitT=setTimeout(()=>{ if(listening){ listening=false; fail('Za mało uderzeń! Koziołki trykają '+r.beats.length+' razy.'); } },2500);
+      }
+      function evaluate(){
+        const r=RHYTHMS[round];
+        let ok=true;
+        if(r.beats.length>2){
+          const span=taps.at(-1)-taps[0], espan=r.beats.at(-1)-r.beats[0];
+          for(let k=1;k<taps.length;k++){
+            const a=(taps[k]-taps[k-1])/span, e=(r.beats[k]-r.beats[k-1])/espan;
+            if(Math.abs(a-e)>.2) ok=false;
+          }
+        }
+        if(ok){
+          jingle(); addStar(); $('#fb').className='feedback good'; $('#fb').textContent=['Świetnie! Koziołki drgnęły! ⭐','Brawo! Zębatki ruszają! ⭐','Mistrzowie rytmu! ⭐'][round];
+          round++;
+          if(round>=RHYTHMS.length){ document.querySelectorAll('#rd span').forEach(s=>s.className='ok'); timers.push(setTimeout(next,1500)); }
+          else timers.push(setTimeout(drawRound,1500));
+        } else fail('Prawie! Rytm był trochę inny – posłuchajcie jeszcze raz.');
+      }
+      function fail(msg){ oops(); $('#fb').className='feedback bad'; $('#fb').textContent=msg; document.querySelectorAll('#pat .beat').forEach(b=>b.classList.remove('you')); taps=[]; $('#tap').disabled=true; }
+      $('#play').onclick=playPattern;
+      $('#tap').onpointerdown=e=>{ e.preventDefault(); onTap(); };
+      const key=e=>{ if(e.code==='Space'){ e.preventDefault(); const t=$('#tap'); if(t&&!t.disabled){ t.classList.add('down'); onTap(); setTimeout(()=>t.classList.remove('down'),100);} } };
+      addEventListener('keydown',key);
+      L.cleanup.push(()=>{ removeEventListener('keydown',key); timers.forEach(clearTimeout); clearTimeout(waitT); });
+      drawRound();
+    },
+    // 4. zegar rusza + legenda
+    p=>{
+      p.innerHTML=`<div class="row">
+        <div class="col"><div class="goat-stage" id="gs"><img src="assets/koziolki.jpg" alt="Koziołki trykają się"><div class="status">✅ ZEGAR TYKA!</div></div></div>
+        <div class="col">
+          <h3>Zegar ożył! ⏰</h3>
+          <p class="story">Tik-tak! Mechanizm ruszył, a koziołki znów się trykają!</p>
+          <div class="letter" style="margin-top:16px">📜 <b>Legenda o koziołkach:</b> Dawno temu, w 1551 roku, kuchcik Pietrek przypalił pieczeń przygotowaną na ucztę dla gości. Szybko pobiegł po dwa koziołki, żeby przygotować nowe danie. Koziołki uciekły jednak na wieżę Ratusza i zaczęły się tam trykać rogami! Wszyscy byli tak rozbawieni, że burmistrz kazał zrobić zegar z koziołkami. Do dziś <b>codziennie w południe trykają się 12 razy</b>!</div>
+          <div class="actions"><button class="btn green" id="fin">Odbierz nagrodę 🎁</button></div>
+        </div></div>`;
+      const gs=$('#gs'); let k=0;
+      const iv=setInterval(()=>{ knock(0,k%2?700:1100,.35); if(k%4===0){ gs.classList.remove('hit'); gs.offsetHeight; gs.classList.add('hit'); } k++; },500);
+      L.cleanup.push(()=>clearInterval(iv));
+      $('#fin').onclick=next;
+    }
+  ]
+};
+
+/* =========================================================
+   POZIOM 2 – Stary Rynek
+========================================================= */
+const L2 = {
+  reward:'Na Starym Rynku znów słychać skoczną muzykę! Do Dziennika trafia <b>Zaczarowana nuta</b> 🎻.',
+  steps:[
+    // 1. karty wiedzy
+    p=>{
+      const CARDS=[
+        {ico:'🎻',t:'Muzykanci',b:'Na weselach, dożynkach i wiejskich zabawach grali muzykanci. Najważniejsze były <b>skrzypce</b> i wielkopolskie dudy, które nazywają się… <b>KOZIOŁ</b>! 🐐 Zupełnie jak nasze koziołki!'},
+        {ico:'💃',t:'Tańce',b:'Tańczono skocznie, w parach i w kole! W Wielkopolsce popularne były: <b>obertas</b> (szybki, wirujący), <b>chodzony</b> i <b>wiwat</b>. Tancerze przytupywali i wirowali do rytmu.'},
+        {ico:'👗',t:'Stroje',b:'Kobiety nosiły szerokie spódnice, haftowane fartuchy i chusty oraz <b>sznury czerwonych korali</b>. Na Starym Rynku stoi pomnik <b>Bamberki</b> – dziewczyny w stroju ludowym z dzbanami.'},
+      ];
+      p.innerHTML=`<h3>🎶 Skoczna melodia na Starym Rynku</h3>
+        <p class="story">Idziecie w głąb Starego Rynku… Słychać skrzypce i dudy! Trafiliście na <b>ludową potańcówkę</b>. Odkryjcie wszystkie 3 karty, żeby dowiedzieć się, jak dawniej bawiono się w Wielkopolsce.</p>
+        <div class="cards">${CARDS.map((c,k)=>`<div class="flip" id="card${k}"><div class="flip-inner">
+          <div class="face front"><div class="big">${c.ico}</div><p>${c.t}</p><small>kliknij, aby odkryć</small></div>
+          <div class="face back"><h4>${c.ico} ${c.t}</h4><div>${c.b}</div></div></div></div>`).join('')}</div>
+        <div class="actions"><button class="btn" id="go" disabled>🔒 Odkryjcie wszystkie karty</button></div>
+        ${teacherNote('Czas na krótką opowieść nauczyciela. Warto dodać, że krakowiak pochodzi z okolic Krakowa, a w Wielkopolsce tańczono m.in. obertasa, chodzonego i wiwata. Można pokazać zdjęcie stroju wielkopolskiego lub pomnika Bamberki.')}`;
+      const opened=new Set();
+      CARDS.forEach((_,k)=>$('#card'+k).onclick=()=>{
+        const c=$('#card'+k); if(c.classList.contains('open')) return;
+        c.classList.add('open'); tone(mtof(72+k*4),0,.4,'triangle',.2); opened.add(k);
+        if(opened.size===CARDS.length){ const g=$('#go'); g.disabled=false; g.textContent='Sprawdźmy wiedzę! ➜'; addStar(); toast('⭐ +1 za odkrycie wszystkich kart!'); }
+      });
+      $('#go').onclick=next;
+    },
+    // 2. quiz
+    p=>quizStep(p,'🧠 Zagadki muzykantów',[
+      {q:'Co nosiły kobiety do wielkopolskiego stroju ludowego?', o:['📿 Czerwone korale','⛑️ Kask','🕶️ Okulary przeciwsłoneczne'], a:0},
+      {q:'Jak nazywają się wielkopolskie dudy?', o:['🎺 Trąbka','🐐 Kozioł','🎸 Gitara'], a:1},
+      {q:'Który taniec tańczono w Wielkopolsce?', o:['🕺 Breakdance','💃 Obertas','🩰 Balet'], a:1},
+    ]),
+    // 3. taniec – zamrażanie
+    p=>{
+      const ROUNDS=5; let round=0, timers=[], running=false;
+      p.innerHTML=`<h3>💃 Taniec i kamienne koziołki</h3>
+        <p class="story">Gdy gra <b>muzyka</b> – tańczcie lekkim krokiem w miejscu, podrygując w rytm ludowej melodii! Gdy muzyka <b>ucichnie</b> – zamieńcie się w <b>kamienne koziołki</b> na Ratuszu i nie ruszajcie się!</p>
+        <div class="round-dots" style="margin-top:14px" id="rd">${Array.from({length:ROUNDS},(_,k)=>`<span>${k+1}</span>`).join('')}</div>
+        <div class="dance-stage idle" id="ds"><div class="notes" id="notes"></div><div><div class="who" id="who">🎻</div><div class="cmd" id="cmd">Gotowi?</div><div class="sub" id="sub">Wstańcie z miejsc!</div></div></div>
+        <div class="actions" style="justify-content:center"><button class="btn red" id="dGo">▶ Start potańcówki</button>${skipLink()}</div>
+        ${teacherNote('Muzyka zatrzymuje się w losowych momentach (5 rund). Nauczyciel obserwuje, kto „zamarł” jak kamienny koziołek. Melodia jest stylizowana na szybki ludowy taniec w metrum 3/4 z burdonem dud (kozła).')}`;
+      bindSkip(p);
+      const ds=$('#ds');
+      let noteIv;
+      function spawnNotes(){ const n=$('#notes'); const s=el('span',{style:`left:${Math.random()*95}%`},['🎵','🎶','🎼'][Math.floor(Math.random()*3)]); n.appendChild(s); setTimeout(()=>s.remove(),3000); }
+      function dance(){
+        ds.className='dance-stage dancing'; $('#who').textContent=['💃','🕺','👯'][round%3]; $('#cmd').textContent='TAŃCZCIE!'; $('#sub').textContent='Lekki krok w miejscu, w rytm muzyki';
+        document.querySelectorAll('#rd span').forEach((s,k)=>s.className=k<round?'ok':k===round?'on':'');
+        folkStart(); noteIv=setInterval(spawnNotes,350);
+        timers.push(setTimeout(freeze, 4500+Math.random()*5000));
+      }
+      function freeze(){
+        folkStop(); clearInterval(noteIv);
+        ds.className='dance-stage freeze'; $('#who').textContent='🗿🐐'; $('#cmd').textContent='ZAMRÓŹCIE SIĘ!'; $('#sub').textContent='Jesteście kamiennymi koziołkami…';
+        knock(0,500,.8);
+        timers.push(setTimeout(()=>{
+          round++;
+          if(round>=ROUNDS){ document.querySelectorAll('#rd span').forEach(s=>s.className='ok'); ds.className='dance-stage idle'; $('#who').textContent='🏆'; $('#cmd').textContent='Wspaniała potańcówka!'; $('#sub').textContent='Poznaliście brzmienie i tempo muzyki ludowej';
+            addStar(2); jingle(); confetti(80); $('#dGo').className='btn green'; $('#dGo').textContent='Dalej ➜'; $('#dGo').disabled=false; $('#dGo').onclick=next; }
+          else dance();
+        }, 3000+Math.random()*1500));
+      }
+      $('#dGo').onclick=()=>{ if(running) return; running=true; $('#dGo').disabled=true; dance(); };
+      L.cleanup.push(()=>{ timers.forEach(clearTimeout); clearInterval(noteIv); });
+    }
+  ]
+};
+
+/* wspólny quiz */
+function quizStep(p, title, Q, onDone){
+  let qi=0;
+  function render(){
+    const q=Q[qi];
+    p.innerHTML=`<h3>${title}</h3><div class="round-dots">${Q.map((_,k)=>`<span class="${k<qi?'ok':k===qi?'on':''}">${k+1}</span>`).join('')}</div>
+      <div class="q"><h4>${q.q}</h4>${q.multi?'<p class="story" style="font-size:1rem;margin-bottom:10px">Zaznaczcie wszystko, co pamiętacie, i kliknijcie „Sprawdź”.</p>':''}<div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div></div>
+      ${q.multi?'<div class="actions"><button class="btn" id="chk">Sprawdź ✔</button></div>':''}<div class="feedback" id="fb"></div>`;
+    const opts=[...p.querySelectorAll('.opt')];
+    if(q.multi){
+      opts.forEach(b=>b.onclick=()=>{ b.classList.toggle('sel'); tone(mtof(76),0,.12,'triangle',.15); });
+      $('#chk').onclick=()=>{
+        const sel=opts.filter(b=>b.classList.contains('sel')).map(b=>+b.dataset.k);
+        const bad=sel.filter(k=>!q.a.includes(k));
+        if(sel.length && !bad.length){ opts.forEach(b=>{ if(q.a.includes(+b.dataset.k)) b.classList.add('right'); b.disabled=true; }); good(); }
+        else { oops(); bad.forEach(k=>opts[k].classList.add('wrong')); $('#fb').className='feedback bad'; $('#fb').textContent=sel.length?'Hmm… coś tu nie pasuje do folkloru! 😄':'Zaznaczcie przynajmniej jedną odpowiedź!'; setTimeout(()=>opts.forEach(b=>b.classList.remove('wrong')),500); }
+      };
+    } else {
+      opts.forEach(b=>b.onclick=()=>{
+        if(+b.dataset.k===q.a){ opts.forEach(x=>x.disabled=true); b.classList.add('right'); good(); }
+        else { oops(); b.classList.add('wrong'); b.disabled=true; $('#fb').className='feedback bad'; $('#fb').textContent='Nie tym razem – spróbujcie jeszcze raz!'; }
+      });
+    }
+  }
+  function good(){
+    jingle(); addStar(); $('#fb').className='feedback good'; $('#fb').textContent=['Doskonale! ⭐','Brawo, detektywi! ⭐','Super! ⭐'][qi%3];
+    const t=setTimeout(()=>{ qi++; if(qi<Q.length) render(); else (onDone||next)(); },1300);
+    L.cleanup.push(()=>clearTimeout(t));
+  }
+  render();
+}
+
+/* =========================================================
+   POZIOM 3 – Ogród Owocowy
+========================================================= */
+const VERSE=['Czerwone','jabłuszko','przekrojone','na krzyż,','czemu ty,','dziewczyno,','krzywo','na mnie','patrzysz?'];
+const L3 = {
+  reward:'Zaginiona piosenka odnaleziona! W Dzienniku ląduje <b>Czerwone jabłuszko</b> 🍎. Została już tylko jedna tajemnica…',
+  steps:[
+    // 1. zbieranie jabłek
+    p=>{
+      const leaves=[[22,38],[35,22],[50,14],[65,22],[78,38],[30,55],[45,42],[60,48],[72,60],[40,68],[56,70],[18,62],[84,58],[50,30]];
+      const appleIdx=[0,2,4,6,7,9,10,11,12]; // 9 jabłek
+      const order=[...VERSE].sort(()=>Math.random()-.5);
+      let found=0;
+      p.innerHTML=`<div class="row" style="align-items:flex-start">
+        <div class="col"><h3>🌳 Historyczny ogród</h3>
+        <p class="story">Ostatnia zagadka zaprowadziła was do starego ogrodu pełnego owoców. Słowa zaginionej piosenki, którą dawniej śpiewano w poznańskich domach, ukryły się w <b>jabłkach</b>! Odsuwajcie liście 🍃 i zbierajcie jabłka.</p>
+        <div class="feedback" id="fb">Znalezione jabłka: 0 / ${appleIdx.length}</div>
+        <div class="basket" id="basket"><span style="opacity:.6">🧺 koszyk</span></div>
+        <div class="actions"><button class="btn hidden" id="go">Ułóżmy piosenkę! ➜</button></div></div>
+        <div class="col"><div class="tree" id="tree"><div class="crown"></div><div class="trunk"></div></div></div></div>
+        ${teacherNote('Uczniowie mogą podchodzić kolejno do tablicy i odsłaniać liście. W 9 z 14 liści ukryte są jabłka ze słowami pierwszej zwrotki piosenki „Czerwone jabłuszko”.')}`;
+      const tree=$('#tree'); let ai=0;
+      leaves.forEach(([x,y],k)=>{
+        const hasApple=appleIdx.includes(k);
+        const word = hasApple ? order[ai++] : null;
+        if(hasApple){ const a=el('div',{class:'apple',style:`left:${x}%;top:${y*0.8}%;display:none`},'🍎'); a.dataset.word=word; tree.appendChild(a); }
+        const lf=el('button',{class:'leaf',style:`left:${x}%;top:${y*0.8}%`,'aria-label':'liść'},'🍃');
+        lf.onclick=()=>{
+          lf.classList.add('gone'); tone(mtof(88+Math.random()*5),0,.08,'triangle',.08);
+          const a=[...tree.querySelectorAll('.apple')].find(ap=>ap.style.left===lf.style.left && ap.style.top===lf.style.top);
+          if(a){ a.style.display='block'; setTimeout(()=>{ a.classList.add('picked'); tone(mtof(79),0,.2,'triangle',.2); tone(mtof(84),.1,.3,'triangle',.2);
+              const b=$('#basket'); if(found===0) b.innerHTML=''; b.appendChild(el('span',{class:'chip'},'🍎 '+a.dataset.word)); found++;
+              $('#fb').textContent=`Znalezione jabłka: ${found} / ${appleIdx.length}`;
+              if(found===appleIdx.length){ $('#fb').className='feedback good'; $('#fb').textContent='Wszystkie jabłka zebrane! 🧺⭐'; addStar(); jingle(); $('#go').classList.remove('hidden'); }
+            },500); }
+          else { toast('🐛 Tylko gąsienica… szukajcie dalej!'); }
+        };
+        tree.appendChild(lf);
+      });
+      $('#go').onclick=next;
+    },
+    // 2. układanie zwrotki
+    p=>{
+      const shuffled=VERSE.map((w,i)=>({w,i})).sort(()=>Math.random()-.5);
+      let pos=0;
+      p.innerHTML=`<h3>🧩 Ułóżcie zaginioną piosenkę</h3>
+        <p class="story">Klikajcie słowa w odpowiedniej kolejności. Podpowiedź: piosenka zaczyna się od koloru jabłuszka! 🍎</p>
+        <div class="verse" id="verse"><span class="ph">… tutaj pojawi się piosenka …</span></div>
+        <div class="basket" id="pool">${shuffled.map(s=>`<button class="chip" data-i="${s.i}">${s.w}</button>`).join('')}</div>
+        <div class="feedback" id="fb"></div>
+        <div class="actions">${skipLink()}</div>`;
+      bindSkip(p);
+      p.querySelectorAll('#pool .chip').forEach(c=>c.onclick=()=>{
+        if(+c.dataset.i===pos){
+          if(pos===0) $('#verse').innerHTML='';
+          $('#verse').appendChild(el('span',{class:'w'},VERSE[pos])); c.classList.add('used'); tone(mtof([62,64,66,67,69,71,73,74,76][pos]),0,.3,'triangle',.2); pos++;
+          if(pos===VERSE.length){ $('#fb').className='feedback good'; $('#fb').textContent='To „Czerwone jabłuszko”! Piosenka odnaleziona! ⭐'; addStar(); jingle(); const t=setTimeout(next,2000); L.cleanup.push(()=>clearTimeout(t)); }
+        } else { c.classList.remove('wrong'); c.offsetHeight; c.classList.add('wrong'); oops(); }
+      });
+    },
+    // 3. śpiew
+    p=>{
+      let iv, on=false, k=0;
+      p.innerHTML=`<h3>🎤 Zaśpiewajmy razem!</h3>
+        <p class="story">Teraz najważniejsze – przywróćcie piosenkę śpiewem! Wyznaczajcie rytm <b>delikatnym klaśnięciem w uda</b>, a przy słowie <b style="color:var(--red2)">jabłuszko</b> zróbcie <b>lekki obrót</b>! 🔄</p>
+        <div class="clap" id="clap">👐</div>
+        <div class="lyrics"><span>Czerwone</span> <span class="apple-word" id="aw">jabłuszko</span><br>przekrojone na krzyż,<br>czemu ty, dziewczyno,<br>krzywo na mnie patrzysz?</div>
+        <div class="legend-box"><span>👐 = klaśnięcie w uda</span><span>🔄 = obrót</span></div>
+        <div class="actions" style="justify-content:center"><button class="btn red" id="beat">▶ Włącz rytm do śpiewu</button><button class="btn green" id="sung">Zaśpiewaliśmy! 🎶</button></div>
+        ${teacherNote('Śpiewamy całą piosenkę (wszystkie zwrotki, które dzieci znają) – na ekranie widoczna jest pierwsza zwrotka. Rytm „klaśnięć w uda” można włączyć jako pomoc. Bez fletów – skupiamy się na czystym śpiewie i radości.')}`;
+      $('#beat').onclick=()=>{
+        on=!on; $('#beat').textContent=on?'⏸ Zatrzymaj rytm':'▶ Włącz rytm do śpiewu';
+        if(on){ iv=setInterval(()=>{ knock(0,k%2?420:300,.6); const c=$('#clap'); c.classList.add('beat'); setTimeout(()=>c.classList.remove('beat'),120); if(k%8===0){ const a=$('#aw'); a.classList.remove('spin'); a.offsetHeight; a.classList.add('spin'); } k++; },560); }
+        else clearInterval(iv);
+      };
+      $('#sung').onclick=()=>{ clearInterval(iv); addStar(2); next(); };
+      L.cleanup.push(()=>clearInterval(iv));
+    }
+  ]
+};
+
+/* =========================================================
+   FINAŁ – Balkon Koziołków
+========================================================= */
+const L4 = {
+  reward:'Zostaliście oficjalnie <b>Super-Detektywami Poznańskiej Muzyki</b>! Miasto znów gra, a koziołki trykają się z radości!',
+  steps:[
+    p=>{
+      p.innerHTML=`<h3>🔐 Ostatnie zabezpieczenie</h3><p class="story">Drzwi na balkon koziołków są zamknięte na szyfr. Otworzy je tylko ten, kto pamięta całą misję! Odpowiedzcie na pytania strażnika Ratusza.</p>
+        <div class="actions"><button class="btn" id="go">Jesteśmy gotowi! 🗝️</button></div>`;
+      $('#go').onclick=next;
+    },
+    p=>quizStep(p,'🗝️ Pytania strażnika Ratusza',[
+      {q:'O jakim mieście opowiadała nasza misja?', o:['🏰 Kraków','🐐 Poznań','⚓ Gdańsk'], a:1},
+      {q:'Jakie zwierzęta uratowaliśmy na wieży ratuszowej?', o:['🕊️ Gołębie','🦁 Lwy','🐐 Koziołki'], a:2},
+      {q:'Co zapamiętaliście z wielkopolskiego folkloru?', o:['🥁 Skoczny rytm','📿 Czerwone korale','🎤 Wspólny śpiew','🍕 Pizza hawajska','🎻 Dudy zwane kozłem'], a:[0,1,2,4], multi:true},
+    ]),
+    p=>{
+      p.innerHTML=`<div class="row">
+        <div class="col"><div class="goat-stage" id="gs"><img src="assets/koziolki.jpg" alt="Koziołki trykają się w południe"><div class="status" id="cnt">Wybija południe…</div></div></div>
+        <div class="col"><h3>Brawo, Agenci! 🎉</h3>
+        <p class="story">Piosenka odtworzona, zegar na Ratuszu znów działa, a koziołki trykają się z radości na wieży! Policzcie na głos wszystkie <b>12 tryknięć</b>!</p>
+        <div class="actions"><button class="btn" id="noon">🔔 Wybij południe!</button><button class="btn green hidden" id="go">Odbierz pieczęć 🏅</button></div></div></div>`;
+      const timers=[];
+      $('#noon').onclick=()=>{
+        $('#noon').disabled=true; const gs=$('#gs');
+        for(let k=0;k<12;k++) timers.push(setTimeout(()=>{ knock(0,1000,.8); bell(0); gs.classList.remove('hit'); gs.offsetHeight; gs.classList.add('hit');
+          const t=el('div',{class:'tryk'},'TRYK!'); gs.appendChild(t); setTimeout(()=>t.remove(),600); $('#cnt').textContent=`🐐 Tryk! ${k+1} / 12`; },k*700));
+        timers.push(setTimeout(()=>{ bigFanfare(); confetti(200); $('#cnt').textContent='🕛 Południe! Miasto uratowane!'; $('#go').classList.remove('hidden'); },12*700+200));
+      };
+      $('#go').onclick=next;
+      L.cleanup.push(()=>timers.forEach(clearTimeout));
+    },
+    p=>{
+      const d=new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
+      p.innerHTML=`<div class="cert">
+        <div class="kicker" style="color:#a1121a">Biuro Poznańskich Detektywów · Stary Ratusz</div>
+        <h3>Dyplom Super-Detektywa<br>Poznańskiej Muzyki</h3>
+        <p style="font-size:1.1rem;margin-top:10px">Niniejszym zaświadcza się, że drużyna</p>
+        <div class="team-name">${escapeHtml(state.team)}</div>
+        <p style="font-size:1.1rem;line-height:1.5">uratowała zegar na poznańskim Ratuszu, przywróciła rytm koziołkom,<br>poznała folklor Wielkopolski i odnalazła piosenkę „Czerwone jabłuszko”.</p>
+        <p style="margin-top:10px;font-weight:800">⭐ Zdobyte gwiazdki: ${state.stars} &nbsp;·&nbsp; 📅 ${d}</p>
+        <div class="seal"><div><div class="s-ico">🐐</div>PIECZĘĆ<br>SUPER-<br>DETEKTYWA</div></div>
+      </div>
+      <div class="actions" style="justify-content:center"><button class="btn ghost" id="print">🖨️ Drukuj dyplom</button><button class="btn" id="go">Zakończ misję 🏆</button></div>`;
+      setTimeout(()=>{ knock(0,200,1); confetti(120); },1000);
+      $('#print').onclick=()=>print();
+      $('#go').onclick=next;
+    }
+  ]
+};
+const LEVELS=[L1,L2,L3,L4];
+function escapeHtml(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* =========================================================
+   KONFETTI
+========================================================= */
+const conf={parts:[],run:false};
+function confetti(n=150){
+  const cv=$('#confetti'); cv.width=innerWidth; cv.height=innerHeight;
+  const cols=['#f7c948','#e5383b','#3ddc97','#38bdf8','#a78bfa','#ffffff'];
+  for(let i=0;i<n;i++) conf.parts.push({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.45,vx:(Math.random()-.5)*18,vy:-Math.random()*18-6,
+    s:6+Math.random()*8,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,life:0});
+  if(!conf.run){ conf.run=true; requestAnimationFrame(confLoop); }
+}
+function confLoop(){
+  const cv=$('#confetti'), x=cv.getContext('2d'); x.clearRect(0,0,cv.width,cv.height);
+  conf.parts.forEach(p=>{ p.vy+=.45; p.vx*=.99; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.life++;
+    x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle=p.c; x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); x.restore(); });
+  conf.parts=conf.parts.filter(p=>p.y<cv.height+40 && p.life<400);
+  if(conf.parts.length) requestAnimationFrame(confLoop); else { conf.run=false; x.clearRect(0,0,cv.width,cv.height); }
+}
+
+/* =========================================================
+   PRZYCISKI NAUCZYCIELA + START
+========================================================= */
+$('#resetBtn').onclick=()=>{ if(confirm('Rozpocząć misję od nowa? Postęp zostanie wyzerowany.')){ localStorage.removeItem(KEY); location.reload(); } };
+$('#fsBtn').onclick=()=>{ document.fullscreenElement? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+
+if(state.team && state.done>0){ $('#intro').classList.add('hidden'); showMap(); }
+else typeLetter();
+</script>
+</body>
+</html>
